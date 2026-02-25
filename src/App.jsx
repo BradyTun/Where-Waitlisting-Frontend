@@ -55,10 +55,10 @@ function App() {
       name: data.name,
       email: data.email,
       profession: data.profession,
-      preferred_meetup_places: data.meetupPlaces,
-      how_often: data.frequency,
-      other_interests_or_hobbies: data.interests,
-      why_join_where: data.reason
+      meetupPlaces: data.meetupPlaces,
+      frequency: data.frequency,
+      interests: data.interests,
+      reason: data.reason
     };
     console.log('Payload:', payload);
     try {
