@@ -9,6 +9,7 @@ function App() {
     email: '',
     profession: '',
     meetupPlaces: [],
+    customPlace: '',
     frequency: '',
     interests: '',
     reason: ''
@@ -25,8 +26,8 @@ function App() {
     const newErrors = {}
     if (!formData.name) newErrors.name = 'Name required'
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Valid email required'
-    if (!formData.profession) newErrors.profession = 'Profession required'
-    if (formData.meetupPlaces.length === 0) newErrors.meetupPlaces = 'Select at least one place'
+    if (!formData.profession || formData.profession === 'Others') newErrors.profession = 'Profession required'
+    if (formData.meetupPlaces.length === 0 || (formData.meetupPlaces.includes('Other') && !formData.customPlace)) newErrors.meetupPlaces = 'Select at least one place'
     if (!formData.frequency) newErrors.frequency = 'Select frequency'
     if (!formData.interests) newErrors.interests = 'Interests required'
     if (!formData.reason) newErrors.reason = 'Reason required'
@@ -43,10 +44,23 @@ function App() {
           ? [...prev.meetupPlaces, value]
           : prev.meetupPlaces.filter(p => p !== value)
       }))
+    } else if (name === 'profession') {
+      setFormData(prev => ({ ...prev, profession: value }))
+    } else if (name === 'professionCustom') {
+      setFormData(prev => ({ ...prev, profession: value }))
+    } else if (name === 'customPlace') {
+      setFormData(prev => ({ ...prev, customPlace: value }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
-    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }))
+    // Clear errors
+    if (name === 'profession' || name === 'professionCustom') {
+      if (errors.profession) setErrors(prev => ({ ...prev, profession: '' }))
+    } else if (name === 'customPlace') {
+      if (errors.meetupPlaces) setErrors(prev => ({ ...prev, meetupPlaces: '' }))
+    } else if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }))
+    }
   }
 
   const submitWaitlist = async (data) => {
@@ -55,7 +69,7 @@ function App() {
       name: data.name,
       email: data.email,
       profession: data.profession,
-      meetupPlaces: data.meetupPlaces,
+      meetupPlaces: data.customPlace ? [...data.meetupPlaces.filter(p => p !== 'Other'), data.customPlace] : data.meetupPlaces,
       frequency: data.frequency,
       interests: data.interests,
       reason: data.reason
@@ -159,14 +173,31 @@ function App() {
             </div>
             <div>
               <label className="block mb-2 glow font-semibold text-purple-300">Profession / What you do: 💼</label>
-              <input
-                type="text"
-                name="profession"
-                value={formData.profession}
-                onChange={handleChange}
-                placeholder="(Helps us match you better with people who get you)"
-                className="w-full p-3 rounded-lg bg-gradient-to-r from-gray-800 to-gray-700 text-white border-2 border-purple-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
-              />
+              <div className="space-y-3 bg-gradient-to-r from-gray-800 to-gray-700 p-4 rounded-lg border border-purple-400">
+                {['Developer', 'Business/Entrepreneurship', 'Marketing', 'Other'].map(prof => (
+                  <label key={prof} className="flex items-center hover:text-yellow-400 transition-colors cursor-pointer p-2 rounded hover:bg-purple-600/20">
+                    <input
+                      type="radio"
+                      name="profession"
+                      value={prof}
+                      checked={formData.profession === prof || (prof === 'Other' && formData.profession && !['Developer', 'Business/Entrepreneurship', 'Marketing'].includes(formData.profession))}
+                      onChange={handleChange}
+                      className="mr-3 accent-purple-500 scale-125"
+                    />
+                    {prof}
+                  </label>
+                ))}
+              </div>
+              {(formData.profession === 'Other' || (formData.profession && !['Developer', 'Business/Entrepreneurship', 'Marketing'].includes(formData.profession))) && (
+                <input
+                  type="text"
+                  name="professionCustom"
+                  value={formData.profession === 'Other' ? '' : formData.profession}
+                  onChange={handleChange}
+                  placeholder="Specify your profession"
+                  className="w-full p-3 mt-2 rounded-lg bg-gradient-to-r from-gray-800 to-gray-700 text-white border-2 border-purple-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+                />
+              )}
               {errors.profession && <p className="text-red-400 text-sm mt-1 animate-pulse">{errors.profession}</p>}
             </div>
             <div>
@@ -185,6 +216,16 @@ function App() {
                   </label>
                 ))}
               </div>
+              {formData.meetupPlaces.includes('Other') && (
+                <input
+                  type="text"
+                  name="customPlace"
+                  value={formData.customPlace}
+                  onChange={handleChange}
+                  placeholder="Specify other place"
+                  className="w-full p-3 mt-2 rounded-lg bg-gradient-to-r from-gray-800 to-gray-700 text-white border-2 border-purple-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-all duration-300 shadow-lg hover:shadow-purple-500/50"
+                />
+              )}
               {errors.meetupPlaces && <p className="text-red-400 text-sm mt-1 animate-pulse">{errors.meetupPlaces}</p>}
             </div>
             <div>
