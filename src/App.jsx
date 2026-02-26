@@ -172,7 +172,7 @@ function App() {
             <div>
               <label className="block mb-2 glow font-semibold text-purple-300">Preferred meetup places: 📍</label>
               <div className="space-y-3 bg-gradient-to-r from-gray-800 to-gray-700 p-4 rounded-lg border border-purple-400">
-                {['Cafes ☕', 'Outdoors 🌳', 'Events / workshops 🎟️', 'Other'].map(place => (
+                {['Cafes ☕', 'Outdoors 🌳', 'Events / workshops 🎟️', 'Beer 🍺', 'Other'].map(place => (
                   <label key={place} className="flex items-center hover:text-yellow-400 transition-colors cursor-pointer p-2 rounded hover:bg-purple-600/20">
                     <input
                       type="checkbox"
